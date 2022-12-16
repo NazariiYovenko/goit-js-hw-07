@@ -1,7 +1,7 @@
 import { galleryItems } from "./gallery-items.js";
-// import * as basicLightbox from "basiclightbox";
-// Change code below this line
+
 const galleryMarkup = createGalleryMarkup(galleryItems);
+
 const galleryEl = document.querySelector(".gallery");
 
 galleryEl.insertAdjacentHTML("beforeend", galleryMarkup);
@@ -27,14 +27,30 @@ function createGalleryMarkup(galleryItems) {
 }
 
 function onGalleryElClick(event) {
+  event.preventDefault();
   if (!event.target.classList.contains("gallery__image")) {
     return;
   }
-  event.preventDefault();
-  const bigGalleryImg = event.target.dataset.source;
-  console.log(bigGalleryImg);
-  const instance = basicLightbox.create(`
-    <img src="${bigGalleryImg}" width="800" height="600">`);
+
+  const boxMarkup = `<img src="${event.target.dataset.source}" width="800" height="600">`;
+
+  function onKeyDownAction(event) {
+    event.preventDefault();
+    if (event.code === "Escape") {
+      instance.close();
+    }
+  }
+
+  const addListener = () =>
+    document.addEventListener("keydown", onKeyDownAction);
+
+  const removeListener = () =>
+    document.removeEventListener("keydown", onKeyDownAction);
+
+  const instance = basicLightbox.create(boxMarkup, {
+    onShow: addListener,
+    onClose: removeListener,
+  });
 
   instance.show();
 }
